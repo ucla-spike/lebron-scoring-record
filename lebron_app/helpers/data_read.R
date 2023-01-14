@@ -1,0 +1,5 @@
+library(tidyverse)
+df <- readRDS('./lebron_app/data/df.RDS')
+sched <- readRDS('./lebron_app/data/sched.RDS')
+career_pts <- readRDS('./lebron_app/data/career_pts.RDS')
+game_log <- readRDS('./lebron_app/data/game_log.RDS')

@@ -1,29 +1,47 @@
 library(bs4Dash)
 library(shiny)
 ui <- dashboardPage(
-  dashboardHeader(title = "Basic dashboard"),
+  dashboardHeader(title = "When will LeBron secure the scoring title?"),
   dashboardSidebar(),
   dashboardBody(
     # Boxes need to be put in a row (or column)
     fluidRow(
       box(
-        title = "Controls",
-        sliderInput("slider", "Number of observations:", 1, 100, 50)
-      ),
+        title = "Parameters",
+        sliderInput("slider", "Number of simulations:", 1, 10000, 100),
+        actionButton(
+          "submit_btn", "Run Simulation", 
+          status = "primary", 
+          outline = TRUE, 
+          flat = TRUE, 
+          size = "lg"
+        )
+      )),
+    fluidRow(
       box(plotOutput("plot1", height = 250))
-      
-      
     )
   )
 )
 
 server <- function(input, output) {
-  set.seed(122)
-  histdata <- rnorm(500)
-  
+  source('./helpers/get_br.R')
+  source('./helpers/data_read.R')
+  source('./helpers/plot.R')
+  source('./helpers/run_sim.R')
+  source('./helpers/he_plays.R')
+  set.seed(2306)
+  data <- eventReactive(input$submit_btn, {
+    n <- input$slider
+    results <- replicate(n, run_sim(career_pts))
+    results_df <- data.frame(game_number = as.integer(names(table(results))),
+                             prob = as.integer(table(results))/10000)
+    fin <- left_join(game_log, results_df, by = 'game_number')
+    fin[is.na(fin$prob), 'prob'] <- 0
+    fin
+  })
   output$plot1 <- renderPlot({
-    data <- histdata[seq_len(input$slider)]
-    hist(data)
+    
+    get_plot(data())
   })
 }
 
