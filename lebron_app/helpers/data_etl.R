@@ -15,6 +15,7 @@ rs_2023$YR <- '2023'
 
 df <- rbind(rs_2020, rs_2021, rs_2022, rs_2023)
 df$Date <- as.Date(df$Date)
+df <- df[df$PTS != 'PTS', ]
 df$points_clean <- as.numeric(with(df, ifelse(PTS %in% c('Inactive', 'Did Not Dress', 'Not With Team'), NA, PTS)))
 df$game_played_flag <- with(df, ifelse(PTS %in% c('Inactive', 'Did Not Dress', 'Not With Team'), 0, 1))
 

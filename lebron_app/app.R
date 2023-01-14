@@ -9,6 +9,12 @@ ui <- dashboardPage(
       box(
         title = "Parameters",
         sliderInput("slider", "Number of simulations:", 1, 10000, 100),
+        checkboxGroupInput("year", "Seasons of data to include:",
+                           c("2021" = "2021",
+                             "2022" = "2022",
+                             "2023" = "2023"),
+                           selected = c('2021', '2022', '2023'),
+                           inline = T),
         actionButton(
           "submit_btn", "Run Simulation", 
           status = "primary", 
@@ -32,7 +38,8 @@ server <- function(input, output) {
   set.seed(2306)
   data <- eventReactive(input$submit_btn, {
     n <- input$slider
-    results <- replicate(n, run_sim(career_pts))
+    year <- input$year
+    results <- replicate(n, run_sim(year, career_pts))
     results_df <- data.frame(game_number = as.integer(names(table(results))),
                              prob = as.integer(table(results))/10000)
     fin <- left_join(game_log, results_df, by = 'game_number')

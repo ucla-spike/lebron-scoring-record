@@ -1,6 +1,7 @@
 source('./helpers/data_read.R')
 
-he_plays <- function() {
+he_plays <- function(year) {
+  df <- df[df$YR %in% year, ]
   mu_play <- mean(df$game_played_flag, na.rm = T)
   mu_ppg <- mean(df[df$game_played_flag == 1, 'points_clean'], na.rm = T)
   sd_ppg <- sd(df[df$game_played_flag == 1, 'points_clean'], na.rm = T)
