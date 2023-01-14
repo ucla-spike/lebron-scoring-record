@@ -1,0 +1,175 @@
+---
+title: "When will He become the GOAT?"
+author: "William Foote"
+date: '2023-01-09'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(goft)
+library(rvest)
+```
+
+# Read in the data, combine into one dataframe
+
+```{r}
+get_br <- function(url, css_selector) {
+  final <- url %>%
+    read_html() %>%
+    html_element(css = css_selector) %>% 
+    html_table()
+  final
+}
+```
+
+```{r, include=FALSE}
+rs_2020 <- read.csv('./data/rs_2020.csv')
+rs_2020$YR <- '2020'
+rs_2021 <- read.csv('./data/rs_2021.csv')
+rs_2021$YR <- '2021'
+rs_2022 <- read.csv('./data/rs_2022.csv')
+rs_2022$YR <- '2022'
+rs_2023 <- get_br('https://www.basketball-reference.com/players/j/jamesle01/gamelog/2023',
+                  '#pgl_basic > tbody')
+names(rs_2023) <- names(rs_2020)[-31]
+rs_2023$YR <- '2023'
+
+df <- rbind(rs_2020, rs_2021, rs_2022, rs_2023)
+df$Date <- as.Date(df$Date)
+df$points_clean <- as.numeric(with(df, ifelse(PTS %in% c('Inactive', 'Did Not Dress', 'Not With Team'), NA, PTS)))
+df$game_played_flag <- with(df, ifelse(PTS %in% c('Inactive', 'Did Not Dress', 'Not With Team'), 0, 1))
+```
+
+# Analyze Data
+
+## How many games does he miss? How often?
+
+```{r}
+# GP = sum(game_played_flag)
+sum(df$game_played_flag)
+# GP Rate = GP / number of possible games played
+sum(df$game_played_flag) / nrow(df)
+with(df, plot(game_played_flag ~ (Date)))
+```
+
+It looks like He's played about 75% of regular season games in the past three seasons.
+
+## How many points per game does he score when he's playing?
+
+```{r}
+# Total PTS in the past 3 seasons
+sum(df$points_clean, na.rm = T)
+# Overall PPG in past 3 seasons (when He plays)
+sum(df[df$game_played_flag == 1, 'points_clean']) / sum(df$game_played_flag)
+# By season:
+ppg_gp <- df %>% 
+  filter(game_played_flag == 1) %>% 
+  group_by(YR) %>% 
+  summarise(PTS = sum(points_clean, na.rm = T), G = n(), PPG = PTS/G)
+ppg_gp
+```
+
+## what about when he doesn't play?
+
+```{r}
+# PPG in the past 3 seasons (counting missed games as 0's)
+ppg_g <- df %>% group_by(YR) %>% 
+  summarise(PTS = sum(points_clean, na.rm = T), G = n(), PPG = PTS/G)
+
+ppg_g
+```
+
+## Compare the differences of when he plays and doesn't
+
+```{r}
+left_join(ppg_gp, ppg_g, by = c('YR')) %>% 
+  summarise((G.y * PPG.y) / (G.x * PPG.x))
+```
+
+So, we know often he has missed games and how many points he scores when he hasn't miss them. What is the distribution of his scoring patterns? Is it normally distributed, or a little more skewed.
+
+## Get remaining schedule
+
+```{r}
+sched <- get_br("https://www.basketball-reference.com/teams/LAL/2023_games.html", css_selector = '#games > tbody')
+
+names(sched)[c(1, 2, 6, 7, 8)] <- c('Game', 'Date', 'Loc', 'Opp', 'Result')
+
+sched <- sched[sched$Date != 'Date', ]
+
+sched$home_flag <- with(sched, ifelse(Loc == '@', 'Away', 'Home'))
+
+```
+
+# Monte Carlo
+
+# he_plays
+
+```{r}
+mu_play <- mean(df$game_played_flag)
+plays_rng <- sample(c(0, 1), prob = c(1-mu_play, mu_play), size = 1, replace = F)
+
+he_plays <- function() {
+  mu_ppg <- mean(df[df$game_played_flag == 1, 'points_clean'], na.rm = T)
+  sd_ppg <- sd(df[df$game_played_flag == 1, 'points_clean'], na.rm = T)
+  plays_rng <- sample(c(0, 1), prob = c(1-mu_play, mu_play), size = 1, replace = F)
+  if (plays_rng == 1) {
+    score <- round(rnorm(1, mean = mu_ppg, sd = sd_ppg))
+  } else {
+    score <- 0
+  }
+  score
+}
+```
+
+generates random number to see if he plays,
+if he does it also generates how many points he scores
+
+# run_sim
+
+wraps he plays
+
+while score_left > 0, keep running he plays
+
+add this to the game log
+
+```{r}
+career_pts <- 37965
+career_pts <- get_br(url = 'https://www.basketball-reference.com/players/j/jamesle01.html',
+                       '#totals > tfoot')[1, 30][[1]]
+run_sim <- function(career_pts) {
+  points_left <- 38387 - career_pts
+  i <- 1
+  while(points_left > 0) {
+    this_score <- he_plays()
+    if (points_left < this_score) {
+      game_log[i, 'points_left'] <- 0
+      points_left <- 0
+      break
+    } else {
+      game_log[i, 'points_left'] <- points_left - this_score
+      points_left <- points_left - this_score
+      i <- i + 1
+    }
+  }
+  i
+}
+```
+
+```{r}
+results <- replicate(10000, run_sim(career_pts))
+
+results_df <- data.frame(game_number = as.integer(names(table(results))), prob = as.integer(table(results))/10000)
+
+
+fin <- left_join(game_log, results_df, by = 'game_number')
+```
+
+### Add exception
+
+if can't find the html, then api limit has been reached
+have a backup as an rds

@@ -1,0 +1,67 @@
+---
+title: "normality distribution"
+author: "William Foote"
+date: '2023-01-09'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Distribution of PTS scored
+
+### Histogram
+
+A raw look at the data
+
+```{r}
+with(df[df$game_played_flag == 1, ], hist(points_clean, prob = T))
+```
+
+### Density
+
+To smooth out the distribution
+
+```{r, warning=FALSE}
+ggdensity(df$points_clean, fill = 'lightgray')
+```
+It looks a little bi-modal, with a strong skew on the right side of the graph.
+
+### Check for normality
+
+Is the data normally distributed? Probably not but idk yet
+
+```{r}
+ggqqplot(df$points_clean)
+```
+
+There are some points that don't lie in the gray area, but not too bad in the right of the graph, actually.
+
+### Run a statistical test for normality
+
+```{r}
+df %>% shapiro_test(points_clean)
+```
+
+Since the p-value is less than .05, the test implies the data is significantly different from a normal distribution. So, we can't assume normality.
+
+This right-skewed shape kinda looks like a Weibull distribution actually.
+
+## Other tests
+
+### Is it a weibull distribution?
+
+```{r}
+weibull_test(df$points_clean)
+```
+
+Nope, p-value still tiny.
+
+### What about beta?
+
+Beta distribution is positively (ie all values greater than 0) right skew. Could be applicable here.
+
+```{r}
+
+```
