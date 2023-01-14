@@ -1,5 +1,5 @@
-source('./data_read.R')
-source('./he_plays.R')
+source('./helpers/data_read.R')
+source('./helpers/he_plays.R')
 run_sim <- function(career_pts) {
   game_log <- sched[sched$Result == '', ]
   game_log$game_number <- 1:nrow(game_log)
