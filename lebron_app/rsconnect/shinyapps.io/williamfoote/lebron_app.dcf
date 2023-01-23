@@ -1,0 +1,13 @@
+name: lebron_app
+title:
+username:
+account: williamfoote
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8034790
+bundleId: 6734088
+url: https://williamfoote.shinyapps.io/lebron_app/
+when: 1673729027.48412
+lastSyncTime: 1673729027.48413
+asMultiple: FALSE
+asStatic: FALSE

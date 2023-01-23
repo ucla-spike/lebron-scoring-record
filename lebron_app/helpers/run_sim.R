@@ -1,13 +1,9 @@
-source('./helpers/data_read.R')
-source('./helpers/he_plays.R')
-run_sim <- function(year, career_pts) {
-  game_log <- sched[sched$Result == '', ]
-  game_log$game_number <- 1:nrow(game_log)
-  game_log$points_left <- NA
-  points_left <- 38387 - career_pts
+run_sim <- function(year, mu_play, ppg_shape, ppg_scale, career_pts) {
+  # Wrapper to run he_plays multiple times
+  points_left <- 38387 - career_pts + 1
   i <- 1
   while(points_left > 0) {
-    this_score <- he_plays(year)
+    this_score <- he_plays(year, mu_play, ppg_shape, ppg_scale)
     if (points_left < this_score) {
       game_log[i, 'points_left'] <- 0
       points_left <- 0

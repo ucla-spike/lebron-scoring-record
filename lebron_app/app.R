@@ -1,5 +1,7 @@
 library(bs4Dash)
 library(shiny)
+library(tidyverse)
+library(EnvStats)
 ui <- dashboardPage(
   dashboardHeader(title = "When will LeBron secure the scoring title?"),
   dashboardSidebar(),
@@ -35,13 +37,12 @@ server <- function(input, output) {
   source('./helpers/plot.R')
   source('./helpers/run_sim.R')
   source('./helpers/he_plays.R')
-  set.seed(2306)
   data <- eventReactive(input$submit_btn, {
     n <- input$slider
     year <- input$year
     results <- replicate(n, run_sim(year, career_pts))
     results_df <- data.frame(game_number = as.integer(names(table(results))),
-                             prob = as.integer(table(results))/10000)
+                             prob = as.integer(table(results))/n)
     fin <- left_join(game_log, results_df, by = 'game_number')
     fin[is.na(fin$prob), 'prob'] <- 0
     fin
@@ -53,3 +54,4 @@ server <- function(input, output) {
 }
 
 shinyApp(ui, server)
+d
