@@ -1,6 +1,3 @@
-library(ggplot2)
-library(ggimage)
-
 get_plot <- function(x) {
   x %>% 
     filter(prob > 0.01) %>% 
@@ -14,7 +11,10 @@ get_plot <- function(x) {
           legend.key.size = unit(2, 'cm'),
           legend.text = element_text(size = 12)) +
     ylab('Probability (%)') +
-    ggtitle('10,000 simulations of when LeBron breaks the NBA scoring record') +
+    ggtitle('10,000 simulations of when LeBron breaks the NBA scoring record',
+            subtitle = paste('Last game: ', paste(rs_2023[nrow(rs_2023), 'Date']),
+                             ' vs. ', paste(rs_2023[nrow(rs_2023), 'Opp']),
+                             sep = '')) +
     geom_image(aes(image = img), size = .075) +
     scale_x_discrete(breaks = (x$date_cleaned)[c(T, rep(F, 3))]) +
     scale_fill_discrete(name = NULL)
