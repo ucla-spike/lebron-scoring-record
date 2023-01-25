@@ -2,6 +2,7 @@ library(bs4Dash)
 library(shiny)
 library(tidyverse)
 library(EnvStats)
+library(ggimage)
 ui <- dashboardPage(
   dashboardHeader(title = "When will LeBron secure the scoring title?"),
   dashboardSidebar(),
