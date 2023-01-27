@@ -17,7 +17,7 @@ get_plot <- function(x) {
                              sep = '')) +
     geom_image(aes(image = img), size = .075) +
     scale_x_discrete(breaks = (x$date_cleaned)[c(T, rep(F, 3))]) +
-    scale_fill_discrete(name = NULL)
+    scale_fill_manual(name = NULL, values = c('purple', 'gold2'))
     
 }
 
