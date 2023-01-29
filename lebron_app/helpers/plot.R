@@ -1,10 +1,19 @@
 get_plot <- function(x) {
+  sub_df <- df[!is.na(df$points_clean), ]
+  pretty_sub_date <- format(sub_df[nrow(sub_df), 'Date'], format = '%b %d')
+  psub_final <- paste("Last game: ", pretty_sub_date, ' vs. ',
+                      paste(sub_df[nrow(sub_df), 'Opp']),
+                      " (", sub_df[nrow(sub_df), 'points_clean'],
+                      " pts)",
+                      sep = '')
+
   x %>% 
     filter(prob > 0.01) %>% 
     ggplot(aes(x = date_cleaned, y = prob, fill = home_flag)) +
     geom_bar(stat = 'identity', width = .95) + 
-    theme(axis.text.x = element_text(angle = 45, hjust=1, size = 12),
-          axis.title.y = element_text(size = 12),
+    theme(axis.text.x = element_text(angle = 45, hjust=1, size = 16),
+          axis.text.y = element_text(size = 16),
+          axis.title.y = element_text(size = 18),
           axis.title.x = element_blank(),
           title = element_text(size = 18),
           legend.position = c(.90, .80),
@@ -12,9 +21,7 @@ get_plot <- function(x) {
           legend.text = element_text(size = 12)) +
     ylab('Probability (%)') +
     ggtitle('10,000 simulations of when LeBron breaks the NBA scoring record',
-            subtitle = paste('Last game: ', paste(rs_2023[nrow(rs_2023), 'Date']),
-                             ' vs. ', paste(rs_2023[nrow(rs_2023), 'Opp']),
-                             sep = '')) +
+            subtitle = psub_final) +
     geom_image(aes(image = img), size = .075) +
     scale_x_discrete(breaks = (x$date_cleaned)[c(T, rep(F, 3))]) +
     scale_fill_manual(name = NULL, values = c('purple', 'gold2'))
