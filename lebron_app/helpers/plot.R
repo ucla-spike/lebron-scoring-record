@@ -1,30 +1,54 @@
 get_plot <- function(x) {
-  sub_df <- df[!is.na(df$points_clean), ]
-  pretty_sub_date <- format(sub_df[nrow(sub_df), 'Date'], format = '%b %d')
-  psub_final <- paste("Last game: ", pretty_sub_date, ' vs. ',
-                      paste(sub_df[nrow(sub_df), 'Opp']),
-                      " (", sub_df[nrow(sub_df), 'points_clean'],
-                      " pts)",
+  # Insert if else to decide how to label the plot's subtitle
+  # If he didn't play in his most recent game it should be formatted as:
+  # Date vs. OPP (Inactive)
+  # If he did play, it should be:
+  # Date vs, OPP (X pts)
+  if (!is.na(df[nrow(df), 'points_clean'])) {
+    caboose <- paste(df[nrow(df), 'Opp'],
+    " (", df[nrow(df), 'points_clean'],
+    " pts)", sep = '')
+  } else {
+    caboose <- paste(df[nrow(df), 'Opp'],
+    " (Inactive)", sep = '')
+  }
+  pretty_sub_date <- format(df[nrow(df), 'Date'], format = '%b %d')
+  psub_final <- paste("Last games: ", pretty_sub_date, ' vs. ',
+                      caboose,
                       sep = '')
-
+  # Make the graph itself
   x %>% 
-    filter(prob > 0.01) %>% 
+    filter(prob > 0.5) %>% 
     ggplot(aes(x = date_cleaned, y = prob, fill = home_flag)) +
-    geom_bar(stat = 'identity', width = .95) + 
-    theme(axis.text.x = element_text(angle = 45, hjust=1, size = 16),
-          axis.text.y = element_text(size = 16),
-          axis.title.y = element_text(size = 18),
-          axis.title.x = element_blank(),
-          title = element_text(size = 18),
-          legend.position = c(.90, .80),
-          legend.key.size = unit(2, 'cm'),
-          legend.text = element_text(size = 12)) +
+    geom_bar(stat = 'identity', width = .95) +
     ylab('Probability (%)') +
     ggtitle('10,000 simulations of when LeBron breaks the NBA scoring record',
-            subtitle = psub_final) +
-    geom_image(aes(image = img), size = .075) +
-    scale_x_discrete(breaks = (x$date_cleaned)[c(T, rep(F, 3))]) +
-    scale_fill_manual(name = NULL, values = c('purple', 'gold2'))
+            subtitle = paste(psub_final,
+                             ', Jan 30 vs. BKN (Inactive)', sep = '')) +
+    geom_image(aes(image = img), size = .125) +
+    geom_textbox(inherit.aes = FALSE, aes(x = date_cleaned, y = prob, label = paste(round(prob), '%', sep = '')),
+              family = 'Chivo', fill = 'white', col = 'black', size = 10, vjust = -1, height = NULL,
+              width = NULL, box.margin = unit(c(0, 0, 0, 0), 'pt'), box.padding = unit(c(.15), 'cm'),
+              show.legend = FALSE) +
+    scale_x_discrete(breaks = (x$date_cleaned)[c(T, rep(F, 2))]) +
+    ylim(0, max(x$prob) + 4) +
+    dark_theme_gray() +
+    theme(text = element_text(family = 'Chivo'),
+          plot.margin = margin(.5, 2, .5, 2, "cm"),
+          axis.text.x = element_text(size = 20, colour = 'white'),
+          axis.text.y = element_text(size = 20, colour = 'white'),
+          axis.ticks = element_line(unit(0, 'pt')),
+          axis.title.y = element_text(size = 20),
+          axis.title.x = element_blank(),
+          title = element_text(size = 18),
+          legend.position = c(.9, .85),
+          legend.key.size = unit(2, 'cm'),
+          legend.text = element_text(size = 18),
+          legend.spacing.y = unit(0, 'pt'),
+          plot.subtitle = element_text(size = 18),
+          panel.grid.major = element_line(color = "grey30", size = 0.2),
+          panel.grid.minor = element_line(color = "grey30", size = 0.2)) +
+    scale_fill_manual(name = NULL, values = c('#552583', '#FDB927'))
     
 }
 
