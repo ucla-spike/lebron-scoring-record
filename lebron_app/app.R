@@ -41,10 +41,11 @@ server <- function(input, output) {
   data <- eventReactive(input$submit_btn, {
     n <- input$slider
     year <- input$year
-    results <- replicate(n, run_sim(year, career_pts))
-    results_df <- data.frame(game_number = as.integer(names(table(results))),
-                             prob = as.integer(table(results))/n)
-    fin <- left_join(game_log, results_df, by = 'game_number')
+    # results <- replicate(n, run_sim(year, career_pts))
+    # results_df <- data.frame(game_number = as.integer(names(table(results))),
+    #                          prob = as.integer(table(results))/n)
+    # fin <- left_join(game_log, results_df, by = 'game_number')
+    fin <- mc_lebron(10000, year = year)
     fin[is.na(fin$prob), 'prob'] <- 0
     fin
   })
@@ -55,4 +56,3 @@ server <- function(input, output) {
 }
 
 shinyApp(ui, server)
-d

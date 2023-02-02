@@ -17,6 +17,7 @@ get_plot <- function(x) {
                       caboose,
                       sep = '')
   # Make the graph itself
+  #labels_subset <- x %>% filter(prob > 5) # Filter which to label
   x %>% 
     filter(prob > 0.5) %>% 
     ggplot(aes(x = date_cleaned, y = prob, fill = home_flag)) +
@@ -26,7 +27,7 @@ get_plot <- function(x) {
             subtitle = paste(psub_final,
                              ', Jan 30 vs. BKN (Inactive)', sep = '')) +
     geom_image(aes(image = img), size = .125) +
-    geom_textbox(inherit.aes = FALSE, aes(x = date_cleaned, y = prob, label = paste(round(prob), '%', sep = '')),
+    geom_textbox(inherit.aes = F, aes(x = date_cleaned, y = prob, label = paste(round(prob), '%', sep = '')),
               family = 'Chivo', fill = 'white', col = 'black', size = 10, vjust = -1, height = NULL,
               width = NULL, box.margin = unit(c(0, 0, 0, 0), 'pt'), box.padding = unit(c(.15), 'cm'),
               show.legend = FALSE) +
