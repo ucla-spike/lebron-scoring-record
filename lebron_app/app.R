@@ -67,7 +67,7 @@ server <- function(input, output) {
   })
   output$plot1 <- renderPlot({
     
-    get_plot(data())
+    get_plot(data(), input$slider)
   })
 }
 

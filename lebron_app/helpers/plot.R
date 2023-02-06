@@ -1,4 +1,4 @@
-get_plot <- function(x) {
+get_plot <- function(x, n) {
   # Insert if else to decide how to label the plot's subtitle
   # If he didn't play in his most recent game it should be formatted as:
   # Date vs. OPP (Inactive)
@@ -23,7 +23,7 @@ get_plot <- function(x) {
     ggplot(aes(x = date_cleaned, y = prob, fill = home_flag)) +
     geom_bar(stat = 'identity', width = .95) +
     ylab('Probability (%)') +
-    ggtitle('10,000 simulations of when LeBron breaks the NBA scoring record',
+    ggtitle(paste(n, 'simulations of when LeBron breaks the NBA scoring record', sep = " "),
             subtitle = paste(psub_final,
                              ', Jan 30 vs. BKN (Inactive)', sep = '')) +
     geom_image(aes(image = img), size = .125) +
