@@ -3,11 +3,18 @@ library(shiny)
 library(tidyverse)
 library(EnvStats)
 library(ggimage)
+library(ggtext)
+library(ggdark)
+
 ui <- dashboardPage(
-  dashboardHeader(title = "When will LeBron secure the scoring title?"),
+  dashboardHeader(title = "LeBron v. Scoring Title",
+                  skin = "dark"),
   dashboardSidebar(),
   dashboardBody(
     # Boxes need to be put in a row (or column)
+    fluidRow(
+      h1("When will LeBron secure the scoring title?")
+    ),
     fluidRow(
       box(
         title = "Parameters",
@@ -29,7 +36,8 @@ ui <- dashboardPage(
     fluidRow(
       box(plotOutput("plot1", height = 250))
     )
-  )
+  ),
+  dark = TRUE
 )
 
 server <- function(input, output) {
@@ -38,6 +46,7 @@ server <- function(input, output) {
   source('./helpers/plot.R')
   source('./helpers/run_sim.R')
   source('./helpers/he_plays.R')
+  source('./helpers/mc_lebron.R')
   data <- eventReactive(input$submit_btn, {
     n <- input$slider
     year <- input$year
