@@ -34,7 +34,11 @@ ui <- dashboardPage(
         )
       )),
     fluidRow(
-      box(plotOutput("plot1", height = 250))
+      box(plotOutput("plot1", height = "600px"),
+          title = "Simulation Plot",
+          width = 12,
+          maximizable = TRUE,
+          background = "purple")
     )
   ),
   dark = TRUE
