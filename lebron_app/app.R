@@ -61,7 +61,7 @@ server <- function(input, output) {
     # results_df <- data.frame(game_number = as.integer(names(table(results))),
     #                          prob = as.integer(table(results))/n)
     # fin <- left_join(game_log, results_df, by = 'game_number')
-    fin <- mc_lebron(10000, year = year)
+    fin <- mc_lebron(n, year = year)
     fin[is.na(fin$prob), 'prob'] <- 0
     fin
   })
