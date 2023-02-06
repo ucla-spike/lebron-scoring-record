@@ -16,6 +16,10 @@ ui <- dashboardPage(
       h1("When will LeBron secure the scoring title?")
     ),
     fluidRow(
+      p("Select 0 hypothetical points if you want to assume nothing about next game."),
+      p("You are able to select hypothetical points for the next game up to one less than the scoring record.")
+    ),
+    fluidRow(
       box(
         title = "Parameters",
         sliderInput("slider", "Number of simulations:", 1, 10000, 100),
@@ -25,6 +29,9 @@ ui <- dashboardPage(
                              "2023" = "2023"),
                            selected = c('2021', '2022', '2023'),
                            inline = T),
+        # slider input for points next game; range: 0 to 1 less than necessary to break record
+        sliderInput('points_next_game', "Hypothetical points next game:", 
+                    min = 0, max = 38387 - career_pts - 1, value = 0),
         actionButton(
           "submit_btn", "Run Simulation", 
           status = "primary", 
@@ -57,11 +64,12 @@ server <- function(input, output) {
   data <- eventReactive(input$submit_btn, {
     n <- input$slider
     year <- input$year
+    points_next_game <- input$points_next_game
     # results <- replicate(n, run_sim(year, career_pts))
     # results_df <- data.frame(game_number = as.integer(names(table(results))),
     #                          prob = as.integer(table(results))/n)
     # fin <- left_join(game_log, results_df, by = 'game_number')
-    fin <- mc_lebron(n, year = year)
+    fin <- mc_lebron(n, year = year, pts_next_game = points_next_game)
     fin[is.na(fin$prob), 'prob'] <- 0
     fin
   })

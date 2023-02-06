@@ -3,10 +3,18 @@ run_sim <-
            mu_play,
            ppg_shape,
            ppg_scale,
-           career_pts) {
+           career_pts,
+           pts_next_game) {
     # Wrapper to run he_plays multiple times
-    points_left <- 38387 - career_pts + 1
+    points_left <- 38387 - (career_pts + pts_next_game) + 1
     i <- 1
+    
+    # if points next game is positive, then it assumes the points of the next game,
+    # so that value is known. The simulation then starts from the game after next.
+    if (pts_next_game > 0) {
+      i <- i + 1
+    }
+    
     while (points_left > 0) {
       this_score <- he_plays(year, mu_play, ppg_shape, ppg_scale)
       if (points_left < this_score) {

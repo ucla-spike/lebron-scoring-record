@@ -1,4 +1,4 @@
-mc_lebron <- function(n, year = c('2021', '2022', '2023')) {
+mc_lebron <- function(n, year = c('2021', '2022', '2023'), pts_next_game = 0) {
   # Wrapper function for run_sim to replicate n times and clean results
   # Get meta data to pass into the other functions
   sub_df <- df[df$YR %in% year, ]
@@ -11,7 +11,7 @@ mc_lebron <- function(n, year = c('2021', '2022', '2023')) {
   
   # Run the simulation
   results <- replicate(n, run_sim(year, mu_play, ppg_shape,
-                                  ppg_scale, career_pts))
+                                  ppg_scale, career_pts, pts_next_game))
   # Put results in a data frame (count and summarise first)
   results_df <- data.frame(game_number = as.integer(names(table(results))),
                            prob = as.integer(table(results))/n)
