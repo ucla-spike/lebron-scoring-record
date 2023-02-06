@@ -30,9 +30,12 @@ ui <- dashboardPage(
           status = "primary", 
           outline = TRUE, 
           flat = TRUE, 
-          size = "lg"
-        )
-      )),
+          size = "lg",
+        ),
+        width = 12,
+        background = "warning"
+      ),
+    ),
     fluidRow(
       box(plotOutput("plot1", height = "600px"),
           title = "Simulation Plot",
