@@ -25,14 +25,14 @@ get_plot <- function(x, n) {
     ylab('Probability (%)') +
     ggtitle(paste(n, 'simulations of when LeBron breaks the NBA scoring record', sep = " "),
             subtitle = paste(psub_final,
-                             ', Jan 30 vs. BKN (Inactive)', sep = '')) +
+                             ', Feb 04 vs. NOP (27 pts)', sep = '')) +
     geom_image(aes(image = img), size = .125) +
     geom_textbox(inherit.aes = F, aes(x = date_cleaned, y = prob, label = paste(round(prob), '%', sep = '')),
               family = 'Chivo', fill = 'white', col = 'black', size = 10, vjust = -1, height = NULL,
               width = NULL, box.margin = unit(c(0, 0, 0, 0), 'pt'), box.padding = unit(c(.15), 'cm'),
               show.legend = FALSE) +
     scale_x_discrete(breaks = (x$date_cleaned)[c(T, rep(F, 2))]) +
-    ylim(0, max(x$prob) + 4) +
+    ylim(0, max(x$prob) + 10) +
     dark_theme_gray() +
     theme(text = element_text(family = 'Chivo'),
           plot.margin = margin(.5, 2, .5, 2, "cm"),
@@ -42,14 +42,14 @@ get_plot <- function(x, n) {
           axis.title.y = element_text(size = 20),
           axis.title.x = element_blank(),
           title = element_text(size = 18),
-          legend.position = c(.9, .85),
+          legend.position = c(.9, .80),
           legend.key.size = unit(2, 'cm'),
           legend.text = element_text(size = 18),
           legend.spacing.y = unit(0, 'pt'),
           plot.subtitle = element_text(size = 18),
           panel.grid.major = element_line(color = "grey30", size = 0.2),
           panel.grid.minor = element_line(color = "grey30", size = 0.2)) +
-    scale_fill_manual(name = NULL, values = c('#552583', '#FDB927'))
+    scale_fill_manual(name = NULL, values = c('#FDB927', '#552583'))
     
 }
 
